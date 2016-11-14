@@ -3,83 +3,107 @@ import Ember from 'ember';
 export default Ember.Route.extend({
     model: function(){
 
-           
-
             var buildingPromises = [];
             var allBuildingData = [];
-            var allBuildings = [];
             var promise = $.ajax({
                     url: 'http://localhost:3000/depts'
 
             }).then(function(response){
                     
-                    //console.log(response)
-                    //console.log(response.deptData.department);
                     response.deptData.department.forEach( function( department ){
-                           // console.log(department)
+
                             if( typeof department.department != 'undefined'){
                                 
                                 if(typeof department.department.code == 'string'){
-                                        //console.log( department.department.code )
-                                        // console.log('http://localhost:3000/courses/' + department.department.code)
-                                        buildingPromises.push($.ajax({
+                                        var deptPromise = $.ajax({
                                                             url: 'http://localhost:3000/courses/' + department.department.code
-
                                         }).then( function(response){
-                                            //console.log(response.length);
                                             allBuildingData.push(response);
-                                            //allBuildings.push( response.buildingCode );
                                             return response;
-                                        }) );
+                                        });
+                                        buildingPromises.push( deptPromise );
                                 }
                                 else{
                                     department.department.forEach(function( dept ){
-                                           //console.log(dept.code)
-                                          // console.log('http://localhost:3000/courses/' + dept.code)
-                                         buildingPromises.push($.ajax({
+                                         var deptPromise = $.ajax({
                                                             url: 'http://localhost:3000/courses/' + dept.code
-
                                         }).then(function( response){
-                                            //console.log(response);
                                             allBuildingData.push(response);
-                                            //allBuildings.push( response.buildingCode );
                                             return response;
 
-                                        }));
+                                        });
+                                        buildingPromises.push( deptPromise);
                                     })
                                 }
                             }
 
                     } );
-                    //return response;
-                   // console.log(buildingPromises.length)
-                    $.when.apply(null, buildingPromises).done(function(data) {
-                        //console.log(buildingPromises)
-                        var flattened = allBuildingData.reduce(function(a, b) {
-                            return a.concat(b);
-                            }, []);
-                        console.log(flattened);
-                        var unique = flattened.reduce( function( buildingArr , building  ){
-                                //console.log( building.buildingCode )
-                               // console.log(buildingArr)
-                               // console.log( buildingArr.indexOf( building.buildingCode ) )
-                                if( buildingArr.indexOf( building.buildingCode ) < 0  ){
-                                    buildingArr.push( building.buildingCode )
+                    return response;
 
-                                }
-                                return buildingArr
-                                    //return ;
 
-                        }, [] );
-                        console.log( unique )
-                        //console.log(allBuildings)
-                        //console.log(data);
+
+
+                    
+            }).then(function(response){
+
+
+
+           var promise2 =  $.when.apply(null, buildingPromises).done(function(data) {
+                   
+                            
+                                //console.log( allBuildingData )
+                                //console.log("ib dtufdsf");
+                                var flattened = allBuildingData.reduce(function(a, b) { return a.concat(b); }, []);
+                                console.log("Flat", flattened)
+                                var unique = flattened.reduce( function( buildingArr , building  ){
+                                    //var name = $.grep(response, function(e){ return e.code == building.buildingCode });
+                                   // if( name.length == 0 ){
+                                        var buildingName = "";
+
+                                    //}
+                                    //else{
+                                    //    var buildingName = name[0].name;
+
+                                    //}
+                                    //console.log(name[0])
+                                    if( building.buildingCode in buildingArr  ){
+                                        if( building.day in buildingArr[building.buildingCode]  ){
+                                            //buildingArr[building.buildingCode][building.day] = {};
+                                            buildingArr[building.buildingCode][building.day]['count'] += parseInt( building.enrolled );
+                                        }
+                                        else{
+                                            
+                                           // buildingArr[building.buildingCode] = {};
+                                           // buildingArr[building.buildingCode][building.day] = {};
+                                           buildingArr[building.buildingCode]['buildingName'] = buildingName;
+                                            buildingArr[building.buildingCode][building.day] = {
+                                                count: parseInt( building.enrolled ),
+                                                code: building.buildingCode
+                                                };
+                                        }
+                                    }
+                                    else{
+                                        buildingArr[building.buildingCode] = {};
+                                        buildingArr[building.buildingCode]['buildingName'] = buildingName;
+                                       // buildingArr[building.buildingCode][building.day] = {};
+                                            buildingArr[building.buildingCode][building.day] = {
+                                                count: parseInt( building.enrolled ),
+                                                code: building.buildingCode
+                                                };
+                                    }
+                                    return buildingArr;
+
+                                }, {} );
+                                console.log( unique )
+                                return unique;
+
+
+                        
                     });
-
+                    console.log(promise2)
+                    return promise2;
             });
-        
-            //return promise;
-
-            
+            console.log(promise)
+            return promise;
     }
 });
