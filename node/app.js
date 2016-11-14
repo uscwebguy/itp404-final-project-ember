@@ -3,8 +3,12 @@ var express = require('express')
 var cors = require('cors')
 var app = express() 
 //var aVar = "aVar";
- 
+var cache = require('apicache').middleware;
+
 app.use(cors())
+app.use(cache('60 minutes'))
+
+
 
 app.get('/', function (req, res) {
      res.send( 'Welcome' )
@@ -26,7 +30,7 @@ app.get('/depts', function (req, res) {
             var deptData = JSON.parse(body)
             //console.log(deptData.department)
             //console.log(Object.keys(deptData).length)
-
+            console.log("API hit");
             var totalDepts = deptData.department.reduce(function(sum, dept){
                     //return sum + dept.department.length
                     var increment = 0;
@@ -44,7 +48,7 @@ app.get('/depts', function (req, res) {
                     return sum + increment
                     
             }, 0)
-            console.log(totalDepts)
+            //console.log(totalDepts)
             //console.log(courseData['OfferedCourses']) 
             //res.send( courseData.OfferedCourses )
 
@@ -58,7 +62,8 @@ app.get('/depts', function (req, res) {
 
             res.send( {
                 deptCount : totalDepts,
-                deptData: deptData
+                deptData: deptData,
+                isCached: 5
             } )
         })
 
@@ -70,10 +75,14 @@ app.get('/courses/:course', function (req, res) {
             //console.log(response.statusCode) // 200 
             //console.log(response.headers['content-type']) // 'image/png' 
             //var uscData = eval(body)
+             var buildingData = [] 
+             if(body.length){
+                
+
             var courseData = JSON.parse(body)
             var offeredCourses = courseData['OfferedCourses']['course']
             //console.log(courseData['OfferedCourses'])
-            var buildingData = [] 
+           
             //console.log(offeredCourses)
             for( var i=0; i < offeredCourses.length; i++ )
             {
@@ -85,23 +94,26 @@ app.get('/courses/:course', function (req, res) {
                         if(typeof location == 'string'){
                             var locationCode = location.substring(0,3)
                             //console.log( location.day )
-                            var sectionDays = sections[j].day.split('')
-                            console.log(sectionDays)
-                            sectionDays.forEach( function(day){
-                                //if( typeof buildingData[locationCode] == 'undefined' ){
-                                //        buildingData[locationCode] = []
+                            console.log(sections[j].day)
+                            if(sections[j].day.length){
+                                var sectionDays = sections[j].day.split('')
+                                console.log(sectionDays)
+                                sectionDays.forEach( function(day){
+                                    //if( typeof buildingData[locationCode] == 'undefined' ){
+                                    //        buildingData[locationCode] = []
 
+                                    //}
+                                    //else{
+                                        buildingData.push( {
+                                            buildingCode: locationCode,
+                                            start: sections[j].start_time,
+                                            end: sections[j].end_time,
+                                            enrolled: sections[j].number_registered,
+                                            day:day
+                                            })
                                 //}
-                                //else{
-                                    buildingData.push( {
-                                        buildingCode: locationCode,
-                                        start: sections[j].start_time,
-                                        end: sections[j].end_time,
-                                        enrolled: sections[j].number_registered,
-                                        day:day
-                                        })
-                               //}
-                            })
+                                })
+                            }
                         }   
                         
                         //console.log( sections[j].start_time )
@@ -120,7 +132,7 @@ app.get('/courses/:course', function (req, res) {
             H
             F
             */
-
+             }
             res.send( buildingData )
         })
      //
