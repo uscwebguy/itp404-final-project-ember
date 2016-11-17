@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 export default Ember.Route.extend({
     model: function(){
-
+            console.log(markers)
             var buildingPromises = [];
             var allBuildingData = [];
             var promise = $.ajax({
@@ -12,9 +12,9 @@ export default Ember.Route.extend({
                     
                     response.deptData.department.forEach( function( department ){
 
-                            if( typeof department.department != 'undefined'){
+                            if( typeof department.department !== 'undefined'){
                                 
-                                if(typeof department.department.code == 'string'){
+                                if(typeof department.department.code === 'string'){
                                         var deptPromise = $.ajax({
                                                             url: 'http://localhost:3000/courses/' + department.department.code
                                         }).then( function(response){
@@ -33,7 +33,7 @@ export default Ember.Route.extend({
 
                                         });
                                         buildingPromises.push( deptPromise);
-                                    })
+                                    });
                                 }
                             }
 

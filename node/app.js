@@ -69,6 +69,34 @@ app.get('/depts', function (req, res) {
 
 })
 
+
+app.get('/alldata', function (req, res) {
+    //
+  request
+        .get('http://web-app.usc.edu/web/soc/api/depts/20171', function(error, response, body) {
+            var deptData = JSON.parse(body)
+            console.log("API hit");
+            var totalDepts = deptData.department.reduce(function(sum, dept){
+                    var increment = 0;
+                    if(typeof dept.department == "object"){
+                            if (Array.isArray( dept.department ))
+                                increment = dept.department.length
+                            else 
+                                increment = 1
+                            dept.departmentCount = increment
+                    }
+                    return sum + increment
+                    
+            }, 0)
+            res.send( {
+                deptCount : totalDepts,
+                deptData: deptData,
+                isCached: 5
+            } )
+        })
+
+})
+
 app.get('/courses/:course', function (req, res) {
       request
         .get('http://web-app.usc.edu/web/soc/api/classes/'+ req.params.course +'/20171', function(error, response, body) {
