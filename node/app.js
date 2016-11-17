@@ -1,12 +1,13 @@
 var request = require('request')
 var express = require('express')
 var cors = require('cors')
+var async = require('async')
 var app = express() 
 //var aVar = "aVar";
 var cache = require('apicache').middleware;
 
 app.use(cors())
-app.use(cache('60 minutes'))
+//app.use(cache('60 minutes'))
 
 
 
@@ -24,21 +25,13 @@ app.get('/depts', function (req, res) {
     //
   request
         .get('http://web-app.usc.edu/web/soc/api/depts/20171', function(error, response, body) {
-            //console.log(response.statusCode) // 200 
-            //console.log(response.headers['content-type']) // 'image/png' 
-            //var uscData = eval(body)
+            var allBuildingData = []
             var deptData = JSON.parse(body)
-            //console.log(deptData.department)
-            //console.log(Object.keys(deptData).length)
             console.log("API hit");
             var totalDepts = deptData.department.reduce(function(sum, dept){
                     //return sum + dept.department.length
                     var increment = 0;
                     if(typeof dept.department == "object"){
-                           // console.log("start")
-                            //console.log( dept.code );
-                            //console.log( Array.isArray( dept.department ));
-                            //console.log( dept.department.length );
                             if (Array.isArray( dept.department ))
                                 increment = dept.department.length
                             else 
@@ -47,63 +40,98 @@ app.get('/depts', function (req, res) {
                     }
                     return sum + increment
                     
-            }, 0)
-            //console.log(totalDepts)
-            //console.log(courseData['OfferedCourses']) 
-            //res.send( courseData.OfferedCourses )
+            }, 0) 
 
             /*
             M
-            T
+            T 
             W
             H
             F
             */
 
-            res.send( {
-                deptCount : totalDepts,
-                deptData: deptData,
-                isCached: 5
-            } )
-        })
-
-})
-
-
-app.get('/alldata', function (req, res) {
-    //
-  request
-        .get('http://web-app.usc.edu/web/soc/api/depts/20171', function(error, response, body) {
-            var deptData = JSON.parse(body)
-            console.log("API hit");
-            var totalDepts = deptData.department.reduce(function(sum, dept){
-                    var increment = 0;
-                    if(typeof dept.department == "object"){
-                            if (Array.isArray( dept.department ))
-                                increment = dept.department.length
-                            else 
-                                increment = 1
-                            dept.departmentCount = increment
+            var deptUrls = [];
+            deptData.department.forEach( function( department ){
+                   if( typeof department.department != 'undefined'){
+                        if(typeof department.department.code == 'string'){
+                               //deptUrls.push( 'http://web-app.usc.edu/web/soc/api/classes/'+ department.department.code +'/20171' )
+                               deptUrls.push( department.department.code )
+                        }
+                        else{
+                            department.department.forEach(function( dept ){
+                                //deptUrls.push( 'http://web-app.usc.edu/web/soc/api/classes/'+ dept.code +'/20171' )
+                                deptUrls.push( dept.code )
+                            })
+                        }
                     }
-                    return sum + increment
-                    
-            }, 0)
-            res.send( {
-                deptCount : totalDepts,
-                deptData: deptData,
-                isCached: 5
-            } )
+            } );
+
+
+            // console.log("Hit 2")
+            // async.map( deptUrls, function( deptUrl ){
+            //     request.get(deptUrl, function(error, response, body){
+            //             var buildingData = JSON.parse(body)
+            //             //console.log( body )
+            //             allBuildingData.push( buildingData );
+            //             //return buildingData
+            //     })
+            // },function(err, results){
+
+            //         console.log(results)
+            //         res.send( allBuildingData )
+            // })
+
+
+            
+
+
+
+            res.send( {urls: deptUrls, count: deptUrls.length} );
+
+
+            // async.map(deptData.department, function( department ){
+            //         if( typeof department.department != 'undefined'){
+            //             if(typeof department.department.code == 'string'){
+            //                    request.get( 'http://web-app.usc.edu/web/soc/api/classes/'+ department.department.code +'/20171', 
+            //                                     function(error, response, body) {
+            //                                     }
+            //                    );
+                                       
+            //             }
+            //             else{
+            //                 department.department.forEach(function( dept ){
+            //                         var deptPromise = $.ajax({
+            //                                         url: 'http://localhost:3000/courses/' + dept.code
+            //                     }).then(function( response){
+            //                         allBuildingData.push(response);
+            //                         return response;
+
+            //                     });
+            //                     buildingPromises.push( deptPromise);
+            //                 })
+            //             }
+            //         }
+
+            // } );
+
+
+            // res.send( {
+            //     deptCount : totalDepts,
+            //     deptData: deptData,
+            //     isCached: 5
+            // } )
         })
 
 })
 
-app.get('/courses/:course', function (req, res) {
+app.get('/courses/:course/:day', function (req, res) {
       request
         .get('http://web-app.usc.edu/web/soc/api/classes/'+ req.params.course +'/20171', function(error, response, body) {
             //console.log(response.statusCode) // 200 
             //console.log(response.headers['content-type']) // 'image/png' 
             //var uscData = eval(body)
              var buildingData = [] 
+             //console.log(body)
              if(body.length){
                 
 
@@ -114,7 +142,20 @@ app.get('/courses/:course', function (req, res) {
             //console.log(offeredCourses)
             for( var i=0; i < offeredCourses.length; i++ )
             {
-                    var sections = offeredCourses[i].CourseData.SectionData
+                    console.log(typeof offeredCourses[i].CourseData.SectionData)
+                    var sections = [];
+                    if(typeof offeredCourses[i].CourseData.SectionData == 'array' ){
+                        sections = offeredCourses[i].CourseData.SectionData.filter(function(section){ return !(section.day.indexOf(req.params.day) < 0 )  })
+                    }
+                    else{
+                        console.log( offeredCourses[i].CourseData.SectionData.day )
+                        if( offeredCourses[i].CourseData.SectionData.hasOwnProperty('day') )
+                            console.log( Object.keys(offeredCourses[i].CourseData.SectionData.day).length)
+                        if( offeredCourses[i].CourseData.SectionData.hasOwnProperty('day') 
+                            && Object.keys(offeredCourses[i].CourseData.SectionData.day).length ){
+                            sections = [offeredCourses[i].CourseData.SectionData].filter(function(section){ return !(section.day.indexOf(req.params.day) < 0 )  })
+                        }
+                    }
                    // console.log( sections )
 
                     for( var j =0; j < sections.length; j++ ){
@@ -123,10 +164,10 @@ app.get('/courses/:course', function (req, res) {
                             var locationCode = location.substring(0,3)
                             //console.log( location.day )
                             console.log(sections[j].day)
-                            if(sections[j].day.length){
+                            //if(sections[j].day.length){
                                 var sectionDays = sections[j].day.split('')
                                 console.log(sectionDays)
-                                sectionDays.forEach( function(day){
+                                //sectionDays.forEach( function(day){
                                     //if( typeof buildingData[locationCode] == 'undefined' ){
                                     //        buildingData[locationCode] = []
 
@@ -137,11 +178,11 @@ app.get('/courses/:course', function (req, res) {
                                             start: sections[j].start_time,
                                             end: sections[j].end_time,
                                             enrolled: sections[j].number_registered,
-                                            day:day
+                                            day:sectionDays
                                             })
                                 //}
-                                })
-                            }
+                               // })
+                            //}
                         }   
                         
                         //console.log( sections[j].start_time )
