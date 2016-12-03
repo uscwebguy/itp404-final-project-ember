@@ -7,7 +7,19 @@ export default Ember.Route.extend({
             var allBuildingData = [];
             var promise = $.ajax({
                     url: 'http://localhost:3000/depts'
-            }).then(function(response){  
+
+
+            })
+            return promise.then(function(response){
+
+                return response.codes;
+            });
+            
+
+
+            
+            promise.then(function(response){
+                    
                     response.urls.forEach( function( department ){
                             var deptPromise = $.ajax({
                                                 url: 'http://localhost:3000/courses/' + department + '/M'
@@ -19,6 +31,7 @@ export default Ember.Route.extend({
 
 
                     } );
+
                      return Ember.RSVP.all(buildingPromises).then(function(posts) {
                         var flattened = allBuildingData.reduce(function(a, b) { return a.concat(b); }, []);
 

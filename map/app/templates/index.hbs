@@ -1,7 +1,10 @@
 {{outlet}}
-<ul>
-{{#each-in model as |building|}}
-    {{building}}
-    <li>{{building.buildingCode}}</li>
-{{/each-in}}
-</ul>
+
+{{!model--}}
+<div class="btn-group btn-group-justified" role="group" aria-label="...">
+  
+{{#each model as |building index|}}
+  <button type="button" class="btn btn-default"> {{building}}</button>
+   
+{{/each}}
+</div>
