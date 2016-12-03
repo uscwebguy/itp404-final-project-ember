@@ -1,5 +1,7 @@
 {{outlet}}
-{{model}}
-{{#each model as |building|}}
-    {{building.buildingCode}}
-{{/each}}
+<ul>
+{{#each-in model as |building|}}
+    {{building}}
+    <li>{{building.buildingCode}}</li>
+{{/each-in}}
+</ul>

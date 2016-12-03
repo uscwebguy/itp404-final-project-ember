@@ -7,9 +7,7 @@ export default Ember.Route.extend({
             var allBuildingData = [];
             var promise = $.ajax({
                     url: 'http://localhost:3000/depts'
-
-            }).then(function(response){
-                    
+            }).then(function(response){  
                     response.urls.forEach( function( department ){
                             var deptPromise = $.ajax({
                                                 url: 'http://localhost:3000/courses/' + department + '/M'
@@ -21,31 +19,24 @@ export default Ember.Route.extend({
 
 
                     } );
-                    //console.log("before promise")
-                    //return response;
                      return Ember.RSVP.all(buildingPromises).then(function(posts) {
                         var flattened = allBuildingData.reduce(function(a, b) { return a.concat(b); }, []);
-                        //console.log( "0", flattened )
-                        //console.log("3", posts)
 
                         var unique = flattened.reduce( function( buildingArr , building  ){
-                                    //var name = $.grep(response, function(e){ return e.code == building.buildingCode });
-                                   // if( name.length == 0 ){
-                                        var buildingName = "";
-
-                                    //}
-                                    //else{
-                                    //    var buildingName = name[0].name;
-
-                                    //}
-                                    //console.log(name[0])
+                                var name = $.grep(markers, function(e){ return e.code == building.buildingCode });
+                                   var buildingName = "";
+                                   if( name.length > 0 ){
+                                        buildingName = name[0].name;
+                                    }
                                     if( building.buildingCode in buildingArr  ){
+                                        //console.log("1");
                                         if( building.day in buildingArr[building.buildingCode]  ){
+                                            //console.log("2");
                                             //buildingArr[building.buildingCode][building.day] = {};
                                             buildingArr[building.buildingCode][building.day]['count'] += parseInt( building.enrolled );
                                         }
                                         else{
-                                            
+                                            //console.log("3");
                                            // buildingArr[building.buildingCode] = {};
                                            // buildingArr[building.buildingCode][building.day] = {};
                                            buildingArr[building.buildingCode]['buildingName'] = buildingName;
@@ -56,8 +47,10 @@ export default Ember.Route.extend({
                                         }
                                     }
                                     else{
+                                        //console.log("4");
                                         buildingArr[building.buildingCode] = {};
                                         buildingArr[building.buildingCode]['buildingName'] = buildingName;
+                                        buildingArr[building.buildingCode]['buildingCode'] = building.buildingCode;
                                        // buildingArr[building.buildingCode][building.day] = {};
                                             buildingArr[building.buildingCode][building.day] = {
                                                 count: parseInt( building.enrolled ),
@@ -70,11 +63,8 @@ export default Ember.Route.extend({
                         console.log( unique )
                         return unique;
                     // posts contains an array of results for the given promises
-                    }).catch(function(reason){
-                    // if any of the promises fails.
-                    });
-                    
-            })
+                    });  
+            });
 
             return promise
            

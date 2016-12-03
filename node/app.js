@@ -39,9 +39,7 @@ app.get('/depts', function (req, res) {
                             dept.departmentCount = increment
                     }
                     return sum + increment
-                    
             }, 0) 
-
             /*
             M
             T 
@@ -49,7 +47,6 @@ app.get('/depts', function (req, res) {
             H
             F
             */
-
             var deptUrls = [];
             deptData.department.forEach( function( department ){
                    if( typeof department.department != 'undefined'){
@@ -64,9 +61,7 @@ app.get('/depts', function (req, res) {
                             })
                         }
                     }
-            } );
-
-
+            });
             // console.log("Hit 2")
             // async.map( deptUrls, function( deptUrl ){
             //     request.get(deptUrl, function(error, response, body){
@@ -121,43 +116,38 @@ app.get('/depts', function (req, res) {
             //     isCached: 5
             // } )
         })
-
 })
+
+app.get('/courselist/:course', function (req, res) {
+      request
+        .get('http://web-app.usc.edu/web/soc/api/classes/'+ req.params.course +'/20171', function(error, response, body) {
+            res.json( body );
+            console.log("here")
+        });
+        });
 
 app.get('/courses/:course/:day', function (req, res) {
       request
         .get('http://web-app.usc.edu/web/soc/api/classes/'+ req.params.course +'/20171', function(error, response, body) {
-            //console.log(response.statusCode) // 200 
-            //console.log(response.headers['content-type']) // 'image/png' 
-            //var uscData = eval(body)
-             var buildingData = [] 
-             //console.log(body)
-             if(body.length){
-                
-
-            var courseData = JSON.parse(body)
-            var offeredCourses = courseData['OfferedCourses']['course']
-            //console.log(courseData['OfferedCourses'])
-           
-            //console.log(offeredCourses)
-            for( var i=0; i < offeredCourses.length; i++ )
-            {
-                    console.log(typeof offeredCourses[i].CourseData.SectionData)
+             var buildingData = [];
+             //console.log( body );
+             if(body.length){ 
+                var courseData = JSON.parse(body)
+                var offeredCourses = courseData['OfferedCourses']['course']
+                //console.log(courseData['OfferedCourses'])
+                //console.log(offeredCourses)
+                for( var i=0; i < offeredCourses.length; i++ )
+                {
                     var sections = [];
                     if(typeof offeredCourses[i].CourseData.SectionData == 'array' ){
                         sections = offeredCourses[i].CourseData.SectionData.filter(function(section){ return !(section.day.indexOf(req.params.day) < 0 )  })
                     }
                     else{
-                        console.log( offeredCourses[i].CourseData.SectionData.day )
-                        if( offeredCourses[i].CourseData.SectionData.hasOwnProperty('day') )
-                            console.log( Object.keys(offeredCourses[i].CourseData.SectionData.day).length)
                         if( offeredCourses[i].CourseData.SectionData.hasOwnProperty('day') 
                             && Object.keys(offeredCourses[i].CourseData.SectionData.day).length ){
                             sections = [offeredCourses[i].CourseData.SectionData].filter(function(section){ return !(section.day.indexOf(req.params.day) < 0 )  })
                         }
                     }
-                   // console.log( sections )
-
                     for( var j =0; j < sections.length; j++ ){
                         var location = sections[j].location
                         if(typeof location == 'string'){
