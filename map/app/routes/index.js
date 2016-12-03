@@ -8,7 +8,16 @@ export default Ember.Route.extend({
             var promise = $.ajax({
                     url: 'http://localhost:3000/depts'
 
-            }).then(function(response){
+            })
+            return promise.then(function(response){
+
+                return response.codes;
+            });
+            
+
+
+            
+            promise.then(function(response){
                     
                     response.urls.forEach( function( department ){
                             var deptPromise = $.ajax({
@@ -21,6 +30,7 @@ export default Ember.Route.extend({
 
 
                     } );
+                    //return buildingPr
                     //console.log("before promise")
                     //return response;
                      return Ember.RSVP.all(buildingPromises).then(function(posts) {
