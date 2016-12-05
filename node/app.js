@@ -48,7 +48,6 @@ app.use(cache('60 minutes'))
 
 
 app.post( '/addfavorite', function(request, response){
-    //console.log( request.body );
     var favorite = Favorite.build({
         studentId: request.body.studentId,
         isbn: request.body.isbn,
@@ -63,7 +62,6 @@ app.post( '/addfavorite', function(request, response){
 });
 
 app.get( '/getfavorites/:studentId', function(request, response){
-    //console.log( request.body );
     var promise = Favorite.findAll({
             where: {
                 studentid: request.params.studentId
@@ -101,13 +99,6 @@ app.get('/depts', function (req, res) {
                     }
                     return sum + increment
             }, 0) 
-            /*
-            M
-            T 
-            W
-            H
-            F
-            */
 
             var deptCode = [];
             deptData.department.forEach( function( department ){
@@ -180,100 +171,6 @@ app.get('/sessionlist/:course', function (req, res) {
         });
 });
 
-app.get('/courses/:course/:day', function (req, res) {
-      request
-        .get('http://web-app.usc.edu/web/soc/api/classes/'+ req.params.course +'/20171', function(error, response, body) {
-
-             var buildingData = [];
-             //console.log( body );
-             if(body.length){ 
-                var courseData = JSON.parse(body)
-                var offeredCourses = courseData['OfferedCourses']['course']
-                //console.log(courseData['OfferedCourses'])
-                //console.log(offeredCourses)
-                for( var i=0; i < offeredCourses.length; i++ )
-                {
-
-                    var sections = [];
-                    if(typeof offeredCourses[i].CourseData.SectionData == 'array' ){
-                        sections = offeredCourses[i].CourseData.SectionData.filter(function(section){ return !(section.day.indexOf(req.params.day) < 0 )  })
-                    }
-                    else{
-                        if( offeredCourses[i].CourseData.SectionData.hasOwnProperty('day') 
-                            && Object.keys(offeredCourses[i].CourseData.SectionData.day).length ){
-                            sections = [offeredCourses[i].CourseData.SectionData].filter(function(section){ return !(section.day.indexOf(req.params.day) < 0 )  })
-                        }
-                    }
-
-                    for( var j =0; j < sections.length; j++ ){
-                        var location = sections[j].location
-                        if(typeof location == 'string'){
-                            var locationCode = location.substring(0,3)
-                            //console.log( location.day )
-                            console.log(sections[j].day)
-                            //if(sections[j].day.length){
-                                var sectionDays = sections[j].day.split('')
-                                console.log(sectionDays)
-                                //sectionDays.forEach( function(day){
-                                    //if( typeof buildingData[locationCode] == 'undefined' ){
-                                    //        buildingData[locationCode] = []
-
-                                    //}
-                                    //else{
-                                        buildingData.push( {
-                                            buildingCode: locationCode,
-                                            start: sections[j].start_time,
-                                            end: sections[j].end_time,
-                                            enrolled: sections[j].number_registered,
-                                            day:sectionDays
-                                            })
-                                //}
-                               // })
-                            //}
-                        }   
-                        
-                        //console.log( sections[j].start_time )
-                        //console.log( sections[j].end_time )
-
-
-                    }
-            }
-
-            //res.send( courseData.OfferedCourses )
-
-            /*
-            M
-            T
-            W
-            H
-            F
-            */
-             }
-            res.send( courseData )
-            //res.send( buildingData )
-        })
-     //
-})
-
-
-app.get('/buildingtypes', function (req, res) {
-       
-    request.get('http://web-app.usc.edu/maps/all_map_data.js', function(error, response, body) {
-         var lookup = {};
-        var items = eval(body);
-        var result = [];
-
-        for (var item, i = 0; item = items[i++];) {
-        var name = item.type;
-
-        if (!(name in lookup)) {
-            lookup[name] = 1;
-            result.push(name);
-        }
-        }
-        res.send( result )
-     })
-})
 
 app.get('/ebay/:isbn', function (req, res) {
 
