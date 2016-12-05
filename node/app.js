@@ -44,7 +44,7 @@ var Favorite = sequelize.define('favorite', {
 
 app.use(cors())
 app.use( bodyParser() );
-//app.use(cache('60 minutes'))
+app.use(cache('60 minutes'))
 
 
 app.post( '/addfavorite', function(request, response){
