@@ -1,22 +1,22 @@
 import Ember from 'ember';
-import ENV from 'map/config/environment'
+import ENV from 'map/config/environment';
 
 export default Ember.Route.extend({
     model: function(params){
     
-        console.log(params)
+        
         var courseCode = params.courseId; 
-        var promise = $.ajax({
+        var promise = Ember.$.ajax({
                     url: ENV.APP.apiEndpoint + '/booksearch/' + params.sectionId + '-'  + courseCode
         });
-        console.log(ENV.APP.apiEndpoint + '/booksearch/' + courseCode)
+        
         return promise.then(function(response){
             
             var ebayPromises = [];
             //var amazonPromises = [];
-            console.log(response)
+            
             response.forEach( function( bookObject ){
-                var ebayPromise = $.ajax({
+                var ebayPromise = Ember.$.ajax({
                                         url: ENV.APP.apiEndpoint + '/ebay/' + bookObject.ISBN
                                     });
                 ebayPromises.push( ebayPromise );

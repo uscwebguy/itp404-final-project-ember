@@ -7,14 +7,13 @@ const Router = Ember.Router.extend({
 });
 
 Router.map(function() {
-  this.route('map', function() {
-    this.route('data');
-  });
-  this.route('list');
   this.route('books', function() {
     this.route('courses', { path: ':id' });
     this.route('sessions',  { path: ':id/:sectionId' });
     this.route('search',  { path: ':id/:sectionId/:courseId' });
+    this.route('add', {path: 'add/:courseId/:isbn'});
+    this.route('get');
+    this.route('list', {path: 'get/:studentId'});
   });
 });
 

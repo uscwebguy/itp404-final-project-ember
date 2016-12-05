@@ -43,7 +43,7 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
-
+    ENV.APP.apiEndpoint = 'https://itp404booksearch.herokuapp.com';
   }
 
   return ENV;

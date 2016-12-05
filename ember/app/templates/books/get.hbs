@@ -1,0 +1,7 @@
+{{outlet}}
+<h2>Add To Favorites</h2>
+<p>Enter your user id to view your favorites</p>
+<form onsubmit={{action 'getFavorites'}}>
+    Enter your student ID: {{input type="text" value=studentId}}
+    <button type="submit" class="btn btn-primary">Get Favorites</button>
+</form>

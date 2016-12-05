@@ -3,8 +3,8 @@ import moduleForAcceptance from 'map/tests/helpers/module-for-acceptance';
 
 moduleForAcceptance('Acceptance | books', {
   beforeEach: function(){
-    window.server.createList('dept', 20)
-    window.server.createList('booksearch', 1)
+    window.server.createList('dept', 20);
+    window.server.createList('booksearch', 1);
 
   },
   afterEach: function(){

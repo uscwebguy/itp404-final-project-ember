@@ -1,0 +1,10 @@
+{{outlet}}
+<h2>Add To Favorites</h2>
+<p>Enter your user id to save book to your favorites</p>
+<form onsubmit={{action 'addToFavorites'}}>
+   {{input type="hidden" value=sectionId}}
+   {{input type="hidden" value=isbn}}
+    
+    Enter your student ID: {{input type="text" value=studentId}}
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>

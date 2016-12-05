@@ -1,7 +1,9 @@
 ITP 404 Final Project
 
-Map My Courses
+USC Book Search
 
-Using the USC Schedule of Classes web service, the Building codes/coordniates from  http://web-app.usc.edu/maps/all_map_data.js, and Google Maps, will allow students to pick their classes, and will show them their directions per day
+Using the USC Schedule of Classes web service, the USC Bookstore required book files (http://www.usc.edu/aux-services/bookstore/booklist/) and the ebay API, I created a simple way to search for books requiered for a course.
 
-(Will use 5 buttons for 5 days) 
+First, the user chooses a department from the left hand sidebar. This will populate a list of courses in the body of the page. 
+
+From here, they select a course, which will list all of the sessions for that course. 

@@ -1,0 +1,24 @@
+{{outlet}}
+My Books
+<table class="table">
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+        </tr>
+    </thead>
+    <tbody>
+{{#each model as |book|}}
+    <tr>
+        <td>{{book.Department}} {{book.Course}}</td>
+        <td>{{book.Title}}</td>
+        <td>{{book.Author}}</td>
+        <td>{{book.ISBN}}</td>
+    </tr>
+{{else}}
+    No results
+{{/each}}
+</tbody>
+</table>

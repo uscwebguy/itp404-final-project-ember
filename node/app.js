@@ -6,17 +6,75 @@ var async = require('async')
 var app = express() 
 //var aVar = "aVar";
 var cache = require('apicache').middleware;
+var bodyParser = require('body-parser')
 
 var config = {devKey: process.env.ebay_dev_key};
 //var ebay = require('ebay-sdk');
 var amazon = require('./api/amazon')
 var ebay = require('./api/ebay')
+var Sequelize = require('sequelize');
 
+var DB_NAME = process.env.DB_NAME;
+var DB_USER = process.env.DB_USER;
+var DB_PASSWORD = process.env.DB_PASS;
+var sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+  dialect: 'mysql',
+  host: process.env.DB_HOST
+});
+
+var Favorite = sequelize.define('favorite', {
+        
+        studentId: {
+            type: Sequelize.INTEGER,
+            field: 'studentid'
+        }, 
+         isbn: {
+            type: Sequelize.STRING,
+            field: 'isbn'
+        },
+         sectionId: {
+            type: Sequelize.INTEGER,
+            field: 'sectionid'
+        }
+        },
+         {
+            timestamps:false
+        }
+);
 
 app.use(cors())
+app.use( bodyParser() );
 //app.use(cache('60 minutes'))
 
 
+app.post( '/addfavorite', function(request, response){
+    //console.log( request.body );
+    var favorite = Favorite.build({
+        studentId: request.body.studentId,
+        isbn: request.body.isbn,
+        sectionId: request.body.section
+
+    });
+
+    favorite.save().then( function(favorite){
+        response.json( favorite )
+
+    } );
+});
+
+app.get( '/getfavorites/:studentId', function(request, response){
+    //console.log( request.body );
+    var promise = Favorite.findAll({
+            where: {
+                studentid: request.params.studentId
+            }
+    }).then( function(results){
+        response.json(results)
+
+
+    } );
+
+});
 
 app.get('/', function (req, res) {
      res.send( '' )
@@ -269,6 +327,26 @@ app.get('/booksearch/:searchid', function(req, res){
             var parsed = JSON.parse(body);
             data = parsed.filter(function( book ){
                 return book.Department == sessionId[0] && book.Course == sessionId[1];
+            });
+        }
+        catch(error){
+        }
+        res.send( data )
+     })
+});
+
+app.get('/booksearchbysession/:sessionid/:isbn', function(req, res){
+    
+    var sessionId = req.params.sessionid;
+
+    request.get( 'http://www.usc.edu/aux-services/bookstore/booklist/171-' + sessionId + '.json' , function(error, response, body) {
+         
+        var data = []
+        try{
+            var parsed = JSON.parse(body);
+            data = parsed.filter(function( book ){
+                console.log(book)
+                return book.ISBN == req.params.isbn;
             });
         }
         catch(error){

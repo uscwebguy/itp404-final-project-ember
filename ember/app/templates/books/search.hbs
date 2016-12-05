@@ -7,6 +7,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th></th>
             <th>Title</th>
             <th>Author</th>
             <th>ISBN</th>
@@ -18,6 +19,7 @@
     <tbody>
 {{#each model.data as |book|}}
     <tr>
+        <td>{{#link-to 'books.add' model.section book.bookData.ISBN class="btn btn-success" }}Add to My Books{{/link-to}}</td>
         <td>{{book.bookData.Title}}</td>
         <td>{{book.bookData.Author}}</td>
         <td>{{book.bookData.ISBN}}</td>

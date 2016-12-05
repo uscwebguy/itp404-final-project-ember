@@ -4,11 +4,14 @@
     "apicache": "^0.3.5",
     "async": "^2.1.2",
     "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
     "chai": "^3.5.0",
     "cors": "^2.8.1",
     "dotenv": "^2.0.0",
     "ebay-sdk": "^0.5.8",
     "express": "^4.14.0",
-    "request": "^2.78.0"
+    "mysql": "^2.12.0",
+    "request": "^2.78.0",
+    "sequelize": "^3.27.0"
   }
 }

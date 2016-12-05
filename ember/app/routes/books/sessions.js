@@ -4,25 +4,28 @@ import ENV from 'map/config/environment';
 export default Ember.Route.extend({
      model: function(params){
 
-        console.log(params)
         var courseCode = params.sectionId;
-        var promise = $.ajax({
+        var promise = Ember.$.ajax({
                     url: ENV.APP.apiEndpoint + '/sessionlist/' + courseCode
-        })
+        });
+
         return promise.then(function(response){
             
             if(response){
+                var sessions;
                 if(response.CourseData.SectionData.length){
-                var sessions = response.CourseData.SectionData.map(function( section ){
-                        return {
-                            sectionid: response.PublishedCourseID + "-" + section.id,
-                            instructor: section.instructor,
-                            day: section.day,
-                            times: section.start_time + "-" + section.end_time,
-                            session: section.id
+                    sessions = response.CourseData.SectionData
+                            .filter(function (section) { return section.type.indexOf("Lec") >=0; })
+                            .map(function( section ){
+                            return {
+                                sectionid: response.PublishedCourseID + "-" + section.id,
+                                instructor: section.instructor,
+                                day: section.day,
+                                times: section.start_time + "-" + section.end_time,
+                                session: section.id
 
-                        };
-                });
+                            };
+                    });
                 }
                 else{
                     var session = {
