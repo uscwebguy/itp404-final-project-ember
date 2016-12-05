@@ -49,6 +49,7 @@ Expects studentId, isbn, and sectionid and saves favorite to Database
 
 /getfavorites/:studentId
 Retrieves saved favorites for a given student id
+https://itp404booksearch.herokuapp.com/getfavorites/1234
 
 Routes in Ember:
   this.route('books', function() {
