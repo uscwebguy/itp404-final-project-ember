@@ -20,6 +20,10 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
+    ENV.APP.apiEndpoint = 'http://localhost:3000'; 
+    ENV['ember-cli-mirage'] = {
+      enabled: false
+    }
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
@@ -30,7 +34,7 @@ module.exports = function(environment) {
   if (environment === 'test') {
     // Testem prefers this...
     ENV.locationType = 'none';
-
+    ENV.APP.apiEndpoint = 'http://localhost:3000'; 
     // keep test console output quieter
     ENV.APP.LOG_ACTIVE_GENERATION = false;
     ENV.APP.LOG_VIEW_LOOKUPS = false;

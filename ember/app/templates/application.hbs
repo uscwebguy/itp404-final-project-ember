@@ -7,7 +7,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Project name</a>
+          <a class="navbar-brand" href="/">USC Book Search</a>
         </div>
       </div>
     </nav>
@@ -15,24 +15,13 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            {{#link-to "index" tagName="li" href=false}}
-              <a {{bind-attr href="view.href"}}>
-                Home
-              </a>
-            {{/link-to}}
-            <li>
-              <a href="#">Map</a>
-            </li>
-            <li>
-              <a href="#">Charts</a>
-              </li>
-            <li>
-              <a href="#">Table</a>
-              </li>
+            {{#each model as |dept|}}
+              <li class="dept"> {{#link-to 'books.courses' dept }}{{dept}}{{/link-to}}</li>
+            {{/each}}
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Dashboard</h1>
+          <h1 class="page-header">USC Book Search</h1>
           {{outlet}}
         </div>
       </div>

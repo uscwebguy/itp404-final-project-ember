@@ -1,0 +1,25 @@
+{{outlet}}
+<div class="breadcrumbs">
+{{#link-to 'books.courses' model.department }}{{model.department}}{{/link-to}} /
+{{model.course}}
+</div>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Section Number</th>
+        <th>Instructor</th>
+        <th>Days</th>
+        <th>Times</th>
+    </tr>
+    </thead>
+    <tbody>
+ {{#each model.sessions as |session|}}
+    <tr> 
+        <td>{{#link-to 'books.search' model.department model.course session.session }}{{session.session}}{{/link-to}}</td>
+        <td>{{session.instructor.first_name}} {{session.instructor.last_name}}</td>
+        <td>{{session.day}}</td>
+        <td>{{session.times}}</td>
+    </tr>
+{{/each}}
+</tbody>
+</table>

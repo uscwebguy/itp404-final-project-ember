@@ -1,3 +1,4 @@
+require('dotenv').config();
 var request = require('request')
 var express = require('express')
 var cors = require('cors')
@@ -6,20 +7,22 @@ var app = express()
 //var aVar = "aVar";
 var cache = require('apicache').middleware;
 
+var config = {devKey: process.env.ebay_dev_key};
+//var ebay = require('ebay-sdk');
+var amazon = require('./api/amazon')
+var ebay = require('./api/ebay')
+
+
 app.use(cors())
 //app.use(cache('60 minutes'))
 
 
 
 app.get('/', function (req, res) {
-     res.send( 'Welcome' )
+     res.send( '' )
   
 })
 
-app.get('/buildings', function (req, res) {
-     getUSCData( res ) 
-  
-})
  
 app.get('/depts', function (req, res) {
     //
@@ -71,10 +74,53 @@ app.get('/depts', function (req, res) {
 app.get('/courselist/:course', function (req, res) {
       request
         .get('http://web-app.usc.edu/web/soc/api/classes/'+ req.params.course +'/20171', function(error, response, body) {
-            res.json( body );
-            console.log("here")
+            var jsonBody;
+            try{
+
+                var parsedBody = JSON.parse( body )
+                jsonBody = {
+                    deptCode: parsedBody.Dept_Info.abbreviation,
+                    deptName: parsedBody.Dept_Info.department,
+                    courses: parsedBody.OfferedCourses.course.map(function( course ){
+                            return {
+                                courseId: course.PublishedCourseID,
+                                title: course.CourseData.title
+                            };
+                    })
+                }
+
+
+            }
+            catch(e){
+                jsonBody = {}
+
+            } 
+            res.send( jsonBody );
         });
+});
+
+app.get('/sessionlist/:course', function (req, res) {
+
+    var courseArr = req.params.course.split('-');
+
+      request
+        .get('http://web-app.usc.edu/web/soc/api/classes/'+ courseArr[0] +'/20171', function(error, response, body) {
+            var jsonBody = [];
+            try{
+                var parsedBody = JSON.parse( body )
+                
+                jsonBody = parsedBody.OfferedCourses.course.filter(function(course){
+                    return course.CourseData.number == courseArr[1].substring(0,3)
+                });
+
+            }
+            catch(e){
+                
+            }
+            res.send( jsonBody[0] );
+
         });
+});
 
 app.get('/courses/:course/:day', function (req, res) {
       request
@@ -171,30 +217,66 @@ app.get('/buildingtypes', function (req, res) {
      })
 })
 
-app.listen(3000)
+app.get('/ebay/:isbn', function (req, res) {
 
-function getUSCData( res ){
+    //var isbn = "9781442253674";
 
-    request.get('http://web-app.usc.edu/maps/all_map_data.js', function(error, response, body) {
-        console.log(response.statusCode) // 200 
-        console.log(response.headers['content-type']) // 'image/png' 
-        var uscData = eval(body)
-        var filteredData = uscData.filter( function( building ){
-                return building.campus == 1 && building.code != '' &&  building.type == 'Building'
-        } )
-        console.log(uscData)
-        console.log(filteredData.length)
+    ebay.search( req.params.isbn ).then( function(response){
+        console.log( response );
+       var ebayResult = response.reduce(
+            function( lowestListing, currentListing ){
+                    //<a href="{{ebayListing.viewItemURL}}" target="_blank">{{format-number ebayListing.sellingStatus.[0].currentPrice.[0].__value__ style="currency" currency="USD" }}</a>
+                    console.log(lowestListing)
 
 
-        res.send( filteredData )
+                    if( lowestListing.price == "" || lowestListing.price < currentListing.price ){
+                        lowestListing = {
+                          url: currentListing.viewItemURL[0],
+                          price: currentListing.sellingStatus[0].currentPrice[0].__value__
+                        };
+                    }
 
-        /*
-        res.send( uscData.map(function(building){
-            return {
-                //name: building.name,
-                type:building.type}
+                    return lowestListing;
 
-        } ) )
-        */
+                    //console.log(ebayObject)
+                    //return ebayObject;
+                }, 
+                {url: "", price:""}
+        );
+        console.log(ebayResult)
+        res.send(ebayResult);
+
+    } );
+
+})
+
+app.get('/amazon/:isbn', function(request, response){
+    amazon.search( request.params.isbn ).then( function( amazonResults ){
+        console.log(amazonResults)
+        response.send( amazonResults );
+    } );
+});
+
+
+app.get('/booksearch/:searchid', function(req, res){
+    
+    var sessionId = req.params.searchid.split('-');
+
+    request.get( 'http://www.usc.edu/aux-services/bookstore/booklist/171-' + sessionId[2] + '.json' , function(error, response, body) {
+         
+        var data = []
+        try{
+            var parsed = JSON.parse(body);
+            data = parsed.filter(function( book ){
+                return book.Department == sessionId[0] && book.Course == sessionId[1];
+            });
+        }
+        catch(error){
+        }
+        res.send( data )
      })
-}
+});
+
+app.listen(process.env.PORT || 3000)
+
+

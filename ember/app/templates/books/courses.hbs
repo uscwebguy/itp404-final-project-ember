@@ -1,0 +1,7 @@
+{{outlet}}
+<h3>{{model.deptName}}</h3>
+<ul class="list-group">
+ {{#each model.courses as |course|}}
+    <li class="list-group-item"> {{#link-to 'books.sessions' model.deptCode course.courseId  }}{{course.courseId}}- {{course.title}}{{/link-to}}</li>
+{{/each}}
+</ul>

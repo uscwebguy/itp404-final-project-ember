@@ -1,0 +1,50 @@
+{{outlet}}
+<div class="breadcrumbs">
+{{#link-to 'books.courses' model.dept }}{{model.dept}}{{/link-to}} /
+{{#link-to 'books.sessions' model.dept model.course }}{{model.course}}{{/link-to}} /
+{{model.section}}
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Bookstore Price</th>
+            <th>Ebook Price</th>
+            <th>Ebay Price</th>
+        </tr>
+    </thead>
+    <tbody>
+{{#each model.data as |book|}}
+    <tr>
+        <td>{{book.bookData.Title}}</td>
+        <td>{{book.bookData.Author}}</td>
+        <td>{{book.bookData.ISBN}}</td>
+        <td class="new-price">
+            {{#if book.bookData.New_Price}}
+                {{format-number book.bookData.New_Price style="currency" currency="USD"}}
+            {{else}}
+                N/A
+            {{/if}}
+        </td>
+        <td >
+             {{#if book.bookData.Ebook_Price}}
+                {{format-number book.bookData.Ebook_Price style="currency" currency="USD"}}
+            {{else}}
+                N/A
+            {{/if}}
+            </td>
+        <td>
+            {{#if book.ebayData.url }}
+                From <a href="{{book.ebayData.url}}" target="_blank">{{format-number book.ebayData.price style="currency" currency="USD" }}</a><br />
+            {{else}}
+                N/A
+            {{/if}}
+        </td>
+    </tr>
+{{else}}
+    No results
+{{/each}}
+    </tbody>
+</table>

@@ -1,8 +1,13 @@
 {
   "dependencies": {
+    "amazon-product-api": "^0.4.2",
     "apicache": "^0.3.5",
-    "cors": "^2.8.1",
     "async": "^2.1.2",
+    "bluebird": "^3.4.6",
+    "chai": "^3.5.0",
+    "cors": "^2.8.1",
+    "dotenv": "^2.0.0",
+    "ebay-sdk": "^0.5.8",
     "express": "^4.14.0",
     "request": "^2.78.0"
   }
