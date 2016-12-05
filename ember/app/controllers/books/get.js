@@ -4,7 +4,7 @@ export default Ember.Controller.extend({
      actions: {
         getFavorites: function(e) {
             e.preventDefault();
-            console.log("gere")
+            //console.log("gere")
             this.transitionToRoute('books.list', this.get('studentId'));
            
         }

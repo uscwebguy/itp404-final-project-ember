@@ -13,6 +13,16 @@ moduleForAcceptance('Acceptance | books', {
   }
 });
 
+test('filling form on /books/get sends us to list page', function(assert) { 
+  visit('/books/get');
+  fillIn('input', '1234');
+  click('button.btn');
+
+  andThen(function() {
+    assert.equal(currentURL(), '/books/list/1234');
+  });
+});
+
 test('visiting /books/:id/:sectionId/:courseId  contains two links in breadcrumbs', function(assert) { 
   visit('/books/:id/:sectionId/:courseId');
 

@@ -13,7 +13,7 @@ Router.map(function() {
     this.route('search',  { path: ':id/:sectionId/:courseId' });
     this.route('add', {path: 'add/:courseId/:isbn'});
     this.route('get');
-    this.route('list', {path: 'get/:studentId'});
+    this.route('list', {path: 'list/:studentId'});
   });
 });
 

@@ -28,6 +28,25 @@ this.get('/ebay/:isbn', function(schema){
 this.get('/booksearch/:sectionId-:courseId', function(schema){
   return schema.db.booksearches;
 });
+
+this.get('/getfavorites/:sectionId', function(schema){
+  return [{
+    id: 16,
+    studentId: 1234,
+    isbn: "9780262512503",
+    sectionId: 11800
+  }];
+});
+
+this.get('/booksearchbysession/:sectionId/:isbn', function(schema){
+  return [{
+    Department: 16,
+    Course: 1234,
+    Author: "9780262512503",
+    ISBN: 11800,
+    Title: "My new title"
+  }];
+});
   /*
     Shorthand cheatsheet:
 
